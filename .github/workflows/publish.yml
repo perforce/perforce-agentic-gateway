@@ -1,0 +1,58 @@
+# Publishes wheels handed to this repo (as GitHub Release assets) to PyPI
+# with PEP 740 provenance attestations via Trusted Publishing.
+#
+# This repo is a code-free release surface for PAG. The private source repo
+# (PerforceCTO/pag) builds the wheels and creates a Release here with the
+# wheels as assets; publishing runs HERE so the attestation's provenance binds
+# to this public repo rather than to the private source repo. See PAG RFC 010
+# §PyPI publishing and provenance attestations.
+#
+# Trusted Publishing is mandatory: attestations are produced ONLY via the OIDC
+# exchange. Adding a username/password/token below would silently disable
+# attestations.
+
+name: Publish to PyPI
+
+on:
+  release:
+    types: [published]
+
+permissions: {}
+
+jobs:
+  pypi-publish:
+    runs-on: ubuntu-latest
+    # Defaults to the production `prod` environment when PYPI_ENVIRONMENT is
+    # unset, so this repo publishes correctly before the repo variables are
+    # configured. A staging stand-in overrides it (e.g. testpypi). The
+    # environment name must match the Trusted Publisher registration exactly.
+    environment: ${{ vars.PYPI_ENVIRONMENT || 'prod' }}
+    permissions:
+      id-token: write          # OIDC for Trusted Publishing + PEP 740
+      contents: read           # download this repo's own release assets
+    steps:
+      - name: Download wheels from the published release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p dist
+          gh release download "${{ github.event.release.tag_name }}" \
+            --repo "${{ github.repository }}" --pattern '*.whl' --dir dist
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Validate wheel metadata
+        run: |
+          python -m pip install --quiet twine
+          python -m twine check dist/*.whl
+
+      - name: Publish to PyPI (Trusted Publishing + attestations)
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          # Defaults to the pypi.org upload endpoint when PYPI_REPOSITORY_URL
+          # is unset; a staging stand-in overrides it (e.g. test.pypi).
+          repository-url: ${{ vars.PYPI_REPOSITORY_URL || 'https://upload.pypi.org/legacy/' }}
+          attestations: true
+          # No username/password/token -- an API token DISABLES attestations.
