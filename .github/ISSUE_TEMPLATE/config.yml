@@ -4,7 +4,7 @@
 # customer, so the support link is a self-select option on the chooser page.
 blank_issues_enabled: false
 contact_links:
-  - name: Perforce Support (paid products)
+  - name: 💎 Perforce Support (paid products)
     url: https://portal.perforce.com/s/contactsupport
     about: >-
       Already have a paid Perforce product or support contract? Please contact
