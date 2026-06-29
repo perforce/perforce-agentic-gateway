@@ -1,0 +1,11 @@
+# Issue chooser configuration.
+# Paid Perforce customers are directed to the Support Portal; everyone else
+# uses the GitHub issue forms below. GitHub cannot detect who is a paying
+# customer, so the support link is a self-select option on the chooser page.
+blank_issues_enabled: false
+contact_links:
+  - name: Perforce Support (paid products)
+    url: https://portal.perforce.com/s/contactsupport
+    about: >-
+      Already have a paid Perforce product or support contract? Please contact
+      Perforce Support directly for the fastest, supported help.

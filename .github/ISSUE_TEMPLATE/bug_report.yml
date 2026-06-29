@@ -1,0 +1,65 @@
+name: 🐞 Bug Report
+description: Report a problem with Perforce Agentic Gateway.
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: >-
+        Thanks for taking the time to file a bug report. If you already have a
+        paid Perforce product or support contract, you may get faster help from
+        [Perforce Support](https://portal.perforce.com/s/contactsupport).
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: A clear description of the bug, including what you expected to happen instead.
+      placeholder: When I run the gateway with ...
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      description: Minimal steps for us to reproduce the behavior.
+      placeholder: |
+        1. Configure the gateway with '...'
+        2. Run '...'
+        3. See error
+    validations:
+      required: true
+  - type: input
+    id: gateway-version
+    attributes:
+      label: Perforce Agentic Gateway version
+      description: Output of `uvx perforce-agentic-gateway@latest --version`, or the version you have installed.
+      placeholder: e.g. 0.1.0
+    validations:
+      required: true
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating system
+      options:
+        - macOS
+        - Linux
+        - Windows
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: client
+    attributes:
+      label: AI client
+      description: Which AI client are you connecting through the gateway with?
+      placeholder: e.g. Claude Code, Cursor, ...
+    validations:
+      required: false
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs or output
+      description: Paste any relevant log output. This will be automatically formatted, so no backticks needed.
+      render: shell
+    validations:
+      required: false
