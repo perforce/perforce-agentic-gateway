@@ -56,3 +56,141 @@ jobs:
           repository-url: ${{ vars.PYPI_REPOSITORY_URL || 'https://upload.pypi.org/legacy/' }}
           attestations: true
           # No username/password/token -- an API token DISABLES attestations.
+
+  # ── MCP registry gate ──────────────────────────────────────────────────────
+  # Finality is the standard GitHub prerelease flag (the source repo marks
+  # non-final tags --prerelease), checked directly in the publish job's `if`.
+  # This job computes the other axis and the version:
+  #  - prod: the wheel went to production pypi.org. The publish job verifies
+  #    ownership against pypi.org and publishes to the production registry, so a
+  #    test.pypi stand-in (which sets PYPI_REPOSITORY_URL) must not reach it. The
+  #    trailing slash is normalized so a non-canonical prod URL still counts.
+  #  - version: the tag with its leading `v` stripped.
+  registry-gate:
+    runs-on: ubuntu-latest
+    outputs:
+      prod: ${{ steps.g.outputs.prod }}
+      version: ${{ steps.g.outputs.version }}
+    steps:
+      - id: g
+        env:
+          PYPI_REPOSITORY_URL: ${{ vars.PYPI_REPOSITORY_URL }}
+        run: |
+          TAG="${{ github.event.release.tag_name }}"
+          echo "version=${TAG#v}" >> "$GITHUB_OUTPUT"
+          url="${PYPI_REPOSITORY_URL%/}"
+          if [ -z "$url" ] || [ "$url" = "https://upload.pypi.org/legacy" ]; then
+            echo "prod=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "prod=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  # ── MCP registry publishing ────────────────────────────────────────────────
+  # After the PyPI publish, list this release in the official MCP registry
+  # (io.github.perforce/perforce-agentic-gateway). The registry stores metadata
+  # only and verifies ownership by reading the live pypi.org project description
+  # for the `mcp-name:` marker, so this runs AFTER pypi-publish and waits for that
+  # description to be live. The `if` gates on: pypi-publish succeeded (explicit,
+  # so a later status-function edit can't silently drop the ordering barrier),
+  # the release is not a prerelease, and the wheel went to prod pypi.org. See PAG
+  # RFC 010 §MCP registry publishing and docs/runbooks/mcp-registry-publishing.md.
+  mcp-registry-publish:
+    needs: [pypi-publish, registry-gate]
+    if: ${{ needs.pypi-publish.result == 'success' && github.event.release.prerelease == false && needs.registry-gate.outputs.prod == 'true' }}
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write          # OIDC login to the MCP registry (io.github.* namespace)
+    env:
+      # Pinned mcp-publisher release + checksum (verified against upstream
+      # registry_<ver>_checksums.txt). Bump both together, deliberately; an
+      # `invalid audience` failure means the registry deployment moved past this
+      # pin. linux_amd64 matches the ubuntu-latest runner, keeping the
+      # single-arch checksum meaningful.
+      MCP_PUBLISHER_VERSION: v1.7.9
+      MCP_PUBLISHER_SHA256: ab128162b0616090b47cf245afe0a23f3ef08936fdce19074f5ba0a4469281ac
+      SERVER_NAME: io.github.perforce/perforce-agentic-gateway
+      PYPI_PACKAGE: perforce-agentic-gateway
+      REPO_URL: https://github.com/${{ github.repository }}
+      VERSION: ${{ needs.registry-gate.outputs.version }}
+      # Defaults to the production registry; a staging stand-in overrides it.
+      MCP_REGISTRY_URL: ${{ vars.MCP_REGISTRY_URL || 'https://registry.modelcontextprotocol.io' }}
+    steps:
+      - name: Install mcp-publisher (pinned + checksum-verified)
+        run: |
+          curl -fsSL -o mcp-publisher.tar.gz \
+            "https://github.com/modelcontextprotocol/registry/releases/download/${MCP_PUBLISHER_VERSION}/mcp-publisher_linux_amd64.tar.gz"
+          echo "${MCP_PUBLISHER_SHA256}  mcp-publisher.tar.gz" | sha256sum -c -
+          tar xzf mcp-publisher.tar.gz mcp-publisher
+
+      - name: Wait for the pypi.org description to carry the marker
+        id: pypi
+        run: |
+          url="https://pypi.org/pypi/${PYPI_PACKAGE}/${VERSION}/json"
+          for attempt in $(seq 1 20); do
+            json="$(curl -fsSL "$url" 2>/dev/null || true)"
+            desc="$(printf '%s' "$json" | jq -r '.info.description // ""' 2>/dev/null || true)"
+            if printf '%s' "$desc" | grep -qF "mcp-name: ${SERVER_NAME}"; then
+              # Reuse this fetch for server.json's description (the pypi.org
+              # summary is the source repo's pyproject [project].description);
+              # the generate step must not refetch.
+              summary="$(printf '%s' "$json" | jq -r '.info.summary // ""')"
+              {
+                echo "summary<<PAG_SUMMARY_EOF"
+                echo "$summary"
+                echo "PAG_SUMMARY_EOF"
+              } >> "$GITHUB_OUTPUT"
+              echo "Marker present in the pypi.org description (attempt ${attempt})."
+              exit 0
+            fi
+            echo "Marker not yet visible (attempt ${attempt}/20)."
+            [ "$attempt" -lt 20 ] && sleep 15
+          done
+          echo "::error::pypi.org description for ${PYPI_PACKAGE} ${VERSION} did not carry the mcp-name marker within the timeout. Retryable -- re-run this job; the PyPI release stands." >&2
+          exit 1
+
+      - name: Generate server.json
+        env:
+          SUMMARY: ${{ steps.pypi.outputs.summary }}
+        run: |
+          # description is the pypi.org summary captured in the wait step (the
+          # source repo's pyproject [project].description); title is the fixed
+          # product name. Both are bounded to 100 chars by the registry schema.
+          jq -n \
+            --arg name "$SERVER_NAME" \
+            --arg desc "$SUMMARY" \
+            --arg repo "$REPO_URL" \
+            --arg ver "$VERSION" \
+            --arg pkg "$PYPI_PACKAGE" \
+            '{
+              "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+              name: $name,
+              title: "Perforce Agentic Gateway",
+              description: $desc,
+              repository: { url: $repo, source: "github" },
+              version: $ver,
+              packages: [{
+                registryType: "pypi",
+                registryBaseUrl: "https://pypi.org",
+                identifier: $pkg,
+                version: $ver,
+                runtimeHint: "uvx",
+                transport: { type: "stdio" }
+              }]
+            }' > server.json
+          cat server.json
+
+      - name: Publish to the MCP registry
+        run: |
+          # Idempotent re-run: a registry version is create-once, so if this
+          # version is already listed (e.g. a prior run published it but lost the
+          # HTTP response), treat this as done rather than letting `publish` fail
+          # "version exists". The GET servers endpoint is public -- no auth.
+          enc_name="$(printf '%s' "$SERVER_NAME" | sed 's,/,%2F,g')"
+          code="$(curl -sS -o /dev/null -w '%{http_code}' \
+            "${MCP_REGISTRY_URL}/v0.1/servers/${enc_name}/versions/${VERSION}" || true)"
+          if [ "$code" = "200" ]; then
+            echo "Version ${VERSION} is already listed in the registry -- nothing to publish."
+            exit 0
+          fi
+          ./mcp-publisher login github-oidc --registry "${MCP_REGISTRY_URL}"
+          ./mcp-publisher publish server.json
