@@ -74,13 +74,13 @@ PAG writes it to your config and starts it.
 
 ### 5. Run a real command
 
-> "Fetch https://modelcontextprotocol.io and tell me what MCP is."
+> "Fetch `https://modelcontextprotocol.io` and tell me what MCP is."
 
 The assistant calls `fetch__fetch` through PAG and answers from the live page.
 
 ## Why it stays fast
 
-```
+```text
 AI client --one stdio connection--> PAG --> server A (command)
                                      | --> server B (remote HTTP)
                                      +-> server C (container)

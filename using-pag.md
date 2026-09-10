@@ -35,11 +35,9 @@ Every server has an **alias** — the short name you choose for it (e.g. `p4`, `
 
 **Conversationally** — ask your assistant to find and enable servers:
 
-> "What MCP servers would help with this project?" — runs `pag__discover`, which scans your project for technology signals and recommends catalog servers. It always asks before enabling.
-
-> "Search the catalog for BlazeMeter and enable it." — runs `pag__search_catalog` then `pag__enable_server`.
-
-> "Add a custom server called mytool that runs `npx -y @example/mcp-server`." — runs `pag__add_server`.
+- "What MCP servers would help with this project?" — runs `pag__discover`, which scans your project for technology signals and recommends catalog servers. It always asks before enabling.
+- "Search the catalog for BlazeMeter and enable it." — runs `pag__search_catalog` then `pag__enable_server`.
+- "Add a custom server called mytool that runs `npx -y @example/mcp-server`." — runs `pag__add_server`.
 
 If the server requires secrets, the assistant replies with a dashboard link where you enter them — secrets never travel through the chat. See [Secrets](secrets.md).
 

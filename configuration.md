@@ -73,7 +73,12 @@ enabled = false   # opt out; telemetry is on by default
 
 Each server is a table keyed by the **alias** you choose.
 
-**Alias rules**: letters, digits, dashes, and underscores only; must not contain a double underscore (`__`); must not be empty; the names `pag` and `ui_builder` are reserved for PAG's own use.
+**Alias rules**:
+
+- Letters, digits, dashes, and underscores only.
+- Must not contain a double underscore (`__`).
+- Must not be empty.
+- The names `pag` and `ui_builder` are reserved for PAG's own use.
 
 A server is one of four kinds, selected by which identity field it sets. The kinds are mutually exclusive:
 
@@ -81,16 +86,20 @@ A server is one of four kinds, selected by which identity field it sets. The kin
 | --- | --- | --- |
 | Registry-sourced | `source` | `command`, `image`, `url` |
 | Local command | `command` | `url` |
-| Container | `image` | `url` (but `command` + `image` together is valid: a custom entrypoint in a container) |
+| Container | `image` | `url` |
 | Remote HTTP | `url` | `command`, `image` |
+
+`command` + `image` together is valid — a custom entrypoint in a container.
 
 ### Common fields
 
 | Key | Type | Applies to | Notes |
 | --- | --- | --- | --- |
-| `enabled` | bool | all | Whether PAG starts the server. PAG starts a server only when `enabled = true` is set explicitly; an omitted `enabled` is treated as off. (The dashboard and `pag__enable_server` set `enabled = true` for you.) A later layer can override either way |
+| `enabled` | bool | all | Whether PAG starts the server |
 | `secrets` | string array | all | Names of secrets this server needs. Values come from the keychain — see [Secrets](secrets.md) |
 | `env` | string table | registry, command, container | Extra environment variables for the server process |
+
+`enabled` defaults to off. PAG starts a server only when `enabled = true` is set explicitly; an omitted `enabled` is treated as off. The dashboard and `pag__enable_server` set `enabled = true` for you. A later layer can override either way.
 
 ### Registry-sourced servers
 
