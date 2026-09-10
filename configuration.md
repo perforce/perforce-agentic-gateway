@@ -14,11 +14,11 @@ PAG merges up to three configuration files, in this order:
 
 Later layers override earlier ones. For servers the merge is per alias and field-by-field: a `[servers.p4]` block in the local layer deep-merges over the project layer's block for that alias, with unset fields falling through from the lower layer.
 
-`<project>` is PAG's working directory --- the directory it was launched in, or the value of `--working-directory` (see the [CLI reference](reference.md#command-line)).
+`<project>` is PAG's working directory — the directory it was launched in, or the value of `--working-directory` (see the [CLI reference](reference.md#command-line)).
 
 PAG watches these files and applies changes live; no restart needed.
 
-You don't create these files by hand --- PAG creates the global config on first run and writes project files as you add servers.
+You don't create these files by hand — PAG creates the global config on first run and writes project files as you add servers.
 
 Unknown top-level keys are ignored (so configs written for newer PAG versions don't break older ones); invalid values are errors. Two exceptions are not silently ignored: a removed `[servers.<alias>.settings]` table is rejected outright, and unknown registry-input keys are logged as warnings.
 
@@ -67,7 +67,7 @@ enabled = false   # opt out; telemetry is on by default
 
 | Key | Type | Notes |
 | --- | --- | --- |
-| `enabled` | bool | Anonymous usage telemetry, **on by default (opt-out)**. Set `false` to turn it off. **Only valid in the global layer** --- PAG rejects it in project or local config |
+| `enabled` | bool | Anonymous usage telemetry, **on by default (opt-out)**. Set `false` to turn it off. **Only valid in the global layer** — PAG rejects it in project or local config |
 
 ## Servers: `[servers.<alias>]`
 
@@ -89,7 +89,7 @@ A server is one of four kinds, selected by which identity field it sets. The kin
 | Key | Type | Applies to | Notes |
 | --- | --- | --- | --- |
 | `enabled` | bool | all | Whether PAG starts the server. PAG starts a server only when `enabled = true` is set explicitly; an omitted `enabled` is treated as off. (The dashboard and `pag__enable_server` set `enabled = true` for you.) A later layer can override either way |
-| `secrets` | string array | all | Names of secrets this server needs. Values come from the keychain --- see [Secrets](secrets.md) |
+| `secrets` | string array | all | Names of secrets this server needs. Values come from the keychain — see [Secrets](secrets.md) |
 | `env` | string table | registry, command, container | Extra environment variables for the server process |
 
 ### Registry-sourced servers
@@ -110,7 +110,7 @@ enabled = true
 
 #### Inputs: `[servers.<alias>.inputs.<NAME>]`
 
-Registry servers declare **inputs** --- named settings (environment variables, arguments, or headers). Configure each by name:
+Registry servers declare **inputs** — named settings (environment variables, arguments, or headers). Configure each by name:
 
 ```toml
 # Simple input --- provide a value:
@@ -124,7 +124,7 @@ host = "p4.example.com"
 port = 8080
 ```
 
-Setting `value` on a templated input is an error --- set its `variables` instead. Variable values may be strings, numbers, or booleans, matching the variable's declared format.
+Setting `value` on a templated input is an error — set its `variables` instead. Variable values may be strings, numbers, or booleans, matching the variable's declared format.
 
 #### Remote variables: `[servers.<alias>.remote.variables]`
 

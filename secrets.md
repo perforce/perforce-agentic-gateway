@@ -1,6 +1,6 @@
 # Secrets
 
-Many MCP servers need credentials --- API keys, tokens, passwords. PAG keeps these out of your config files, out of version control, and out of your AI conversations.
+Many MCP servers need credentials — API keys, tokens, passwords. PAG keeps these out of your config files, out of version control, and out of your AI conversations.
 
 ## How secrets are entered
 
@@ -9,7 +9,7 @@ Secrets are entered through the **dashboard**, not through chat. When a server n
 - If your assistant is enabling the server, it replies with a dashboard link for secret entry. Open it, enter the value, done.
 - In the dashboard, each server's secret entry page (linked from its Config tab) shows each required secret, whether it is set, and forms to enter or replace values.
 
-Your AI assistant never sees secret values --- config files reference secrets by *name only*.
+Your AI assistant never sees secret values — config files reference secrets by *name only*.
 
 ## Where secrets are stored
 
@@ -37,7 +37,7 @@ Project-scoped entries let two projects use different credentials for the same s
 
 ### Environment variable fallback
 
-For CI machines or environments where a keychain isn't practical, PAG also accepts secrets from environment variables named `<ALIAS>__<SECRET>` --- the server alias uppercased with dashes replaced by underscores, then a double underscore, then the secret name. For example, the `TOKEN` secret of server `my-tool` can be provided as:
+For CI machines or environments where a keychain isn't practical, PAG also accepts secrets from environment variables named `<ALIAS>__<SECRET>` — the server alias uppercased with dashes replaced by underscores, then a double underscore, then the secret name. For example, the `TOKEN` secret of server `my-tool` can be provided as:
 
 ```sh
 export MY_TOOL__TOKEN=...      # Linux/macOS
@@ -48,8 +48,8 @@ $env:MY_TOOL__TOKEN = "..."    # Windows (PowerShell)
 
 Depends on the server kind:
 
-- **Local command / container servers** --- secrets are injected as environment variables in the server's process.
-- **Remote HTTP servers** --- secrets are substituted into headers using `${NAME}` placeholders:
+- **Local command / container servers** — secrets are injected as environment variables in the server's process.
+- **Remote HTTP servers** — secrets are substituted into headers using `${NAME}` placeholders:
 
   ```toml
   [servers.internal-api]
@@ -64,6 +64,6 @@ Registry servers declare their secrets in their catalog metadata, so PAG knows w
 
 ## Good practices
 
-- Commit `.pag/config.toml` freely --- it holds secret *names*, never values.
+- Commit `.pag/config.toml` freely — it holds secret *names*, never values.
 - Use project-scoped secrets when different projects need different credentials.
 - On shared/CI machines, prefer `<ALIAS>__<SECRET>` environment variables over the fallback file.

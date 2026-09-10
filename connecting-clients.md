@@ -1,6 +1,6 @@
 # Connecting AI clients
 
-PAG runs as a **stdio MCP server**, launched via `uvx`. Any client that can launch a local stdio MCP server can use PAG. (Clients that connect only to *remote* MCP servers --- a URL, not a local command --- cannot.)
+PAG runs as a **stdio MCP server**, launched via `uvx`. Any client that can launch a local stdio MCP server can use PAG. (Clients that connect only to *remote* MCP servers — a URL, not a local command — cannot.)
 
 ## The pattern
 
@@ -13,9 +13,9 @@ Every client comes down to the same command and arguments:
 | transport | stdio |
 
 - **`@latest`** makes each launch use the newest PAG. Drop it, or pin `perforce-agentic-gateway@2026.1`, to lock a version.
-- **`--working-directory`** sets the project root PAG reads `.pag/config.toml` from. Clients launched from your project (Claude Code, Codex, Cursor, VS Code) already use the right directory --- only add the flag to pin a project regardless of where the client starts.
+- **`--working-directory`** sets the project root PAG reads `.pag/config.toml` from. Clients launched from your project (Claude Code, Codex, Cursor, VS Code) already use the right directory — only add the flag to pin a project regardless of where the client starts.
 
-If you've installed PAG as a tool (`uv tool install perforce-agentic-gateway` --- see [Installing PAG as a tool](reference.md#installing-pag-as-a-tool)), set command to `perforce-agentic-gateway` with no arguments; everything else is the same.
+If you've installed PAG as a tool (`uv tool install perforce-agentic-gateway` — see [Installing PAG as a tool](reference.md#installing-pag-as-a-tool)), set command to `perforce-agentic-gateway` with no arguments; everything else is the same.
 
 Generic `.mcp.json` (Cursor and others):
 
@@ -72,4 +72,4 @@ Verify with **MCP: List Servers** (also shows status and logs), or the tools ico
 
 ## Cursor
 
-`.cursor/mcp.json` (per project) or `~/.cursor/mcp.json` (global) --- the generic `.mcp.json` block above. Verify in **Cursor Settings -> MCP**.
+`.cursor/mcp.json` (per project) or `~/.cursor/mcp.json` (global) — the generic `.mcp.json` block above. Verify in **Cursor Settings -> MCP**.
