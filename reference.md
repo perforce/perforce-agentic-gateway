@@ -14,7 +14,7 @@ PAG runs via `uvx` — there's no install step. The command is `uvx perforce-age
 
 ### Synopsis
 
-```
+```text
 uvx perforce-agentic-gateway [flags]         Run as an MCP gateway (what AI clients launch)
 uvx perforce-agentic-gateway view [flags]    Open the browser dashboard
 uvx perforce-agentic-gateway --version       Print version and exit
@@ -79,7 +79,7 @@ See [Logging and troubleshooting](troubleshooting.md) for how to use the logging
 
 ### Version scheme
 
-```
+```text
 $ uvx perforce-agentic-gateway --version
 pag 2026.1 (pypi, 1970.1)
 ```
