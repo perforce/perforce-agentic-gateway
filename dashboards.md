@@ -2,9 +2,7 @@
 
 Perforce Agentic Gateways's **UI Builder** lets your AI assistant build rich web dashboards over the MCP servers you have configured — a P4 changelist board, a BlazeMeter results view, a deployment status page. If you have not connected PAG to your AI client yet, start with the [README](README.md).
 
-- You describe what you want in chat.
-- The assistant writes the code.
-- PAG serves it at a URL you can bookmark.
+You describe what you want in chat, the assistant writes the code, and PAG serves it at a URL you can bookmark.
 
 - [What a dashboard is](#what-a-dashboard-is)
 - [Creating one](#creating-one)
