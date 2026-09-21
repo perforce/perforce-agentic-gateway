@@ -97,6 +97,8 @@ Full mechanics (the sandbox, qualified tool names, prompts and resources) are in
 
 - **[Connecting AI clients](connecting-clients.md)** — Claude Code, Codex, VS Code, Cursor.
 - **[Using PAG](using-pag.md)** — managing servers, the dashboard, the catalog and registries, Perforce servers, the tools/sandbox model.
+- **[Dashboards](dashboards.md)** — build browser dashboards over your servers with the UI Builder.
+- **[Sharing dashboards](sharing-dashboards.md)** — export a dashboard to another project, and import one.
 - **[Secrets](secrets.md)** — entering, storing, and looking up credentials.
 - **[Configuration](configuration.md)** — the complete `config.toml` reference.
 - **[Troubleshooting](troubleshooting.md)** — logging and common fixes.

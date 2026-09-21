@@ -113,9 +113,13 @@ To remove all traces, also delete:
 
 **catalog** — Two related senses: (1) the set of installable servers PAG aggregates from your registries (what you browse on the dashboard's Catalog page); (2) the searchable index of your enabled servers' tools that your assistant queries via `pag__explore`.
 
-**dashboard** — PAG's browser UI, served on `127.0.0.1` and opened with `uvx perforce-agentic-gateway view`. Manage servers, browse the catalog, enter secrets.
+**component** — A reusable UI building block a dashboard imports as `@components/<Name>`. Shared components live in `.pag/ui-components/`; a dashboard's own `components/` directory overrides the shared pool for that dashboard. PAG also provides a separate built-in component library. See [Dashboards](dashboards.md#reusable-components).
+
+**dashboard** — Two related senses: (1) PAG's browser UI, served on `127.0.0.1` and opened with `uvx perforce-agentic-gateway view`; (2) a page built with the [UI Builder](dashboards.md) that visualizes data from your MCP servers, served by that same UI at `/dashboards/<name>/`.
 
 **downstream server** — Any MCP server PAG connects to on your behalf: a local command, a container, or a remote HTTP endpoint.
+
+**export file** — A `.zip` holding one exported dashboard and the list of servers it needs. Credential-purpose configuration fields are excluded, but allowed execution-detail values are copied verbatim. See [Sharing dashboards](sharing-dashboards.md).
 
 **gateway** — A program that presents one MCP server to a client while connecting to many MCP servers behind it. PAG is a gateway.
 
@@ -126,6 +130,10 @@ To remove all traces, also delete:
 **qualified name** — A downstream tool's full address through PAG: `<alias>__<toolname>`, e.g. `p4__submit`. Resources use `<alias>+<original uri>`.
 
 **registry** — An HTTP catalog of installable MCP servers (`[[registries]]` in config). PAG ships pointed at the Perforce registry. A `devcatalog` registry is the same thing as a local directory.
+
+**servers this dashboard needs** — A dashboard's declaration of which MCP servers it calls, written so it means the same thing in another project. Required for export. See [Sharing dashboards](sharing-dashboards.md#why-export-exists).
+
+**UI Builder** — PAG's built-in dashboard authoring feature. Its tools let your assistant scaffold, validate, and manage dashboards; the code itself is written by the assistant. See [Dashboards](dashboards.md).
 
 **sandbox** — The locked-down JavaScript environment inside PAG where `pag__execute` and `pag__explore` programs run. No network, no filesystem, no imports; its only outside capability is `callTool()`.
 

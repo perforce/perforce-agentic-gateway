@@ -168,6 +168,10 @@ A read-only list of your active registries (the Perforce default plus any you've
 
 A form for custom servers that aren't in any registry — local commands, containers, or remote HTTP endpoints.
 
+#### Dashboards
+
+The gallery of dashboards built for this project with the UI Builder, plus the actions for importing one from another project. See [Dashboards](dashboards.md).
+
 ### Security
 
 - Binds to `127.0.0.1` only; never exposed to the network.
